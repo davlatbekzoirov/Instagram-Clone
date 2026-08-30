@@ -1,8 +1,8 @@
 import uuid
 from random import random
-
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from rest_framework_simplejwt.tokens import RefreshToken
 from shared.models import BaseModel
 from datetime import datetime, timedelta
 from django.core.validators import FileExtensionValidator
@@ -63,7 +63,15 @@ class User(AbstractUser, BaseModel):
             temp_password = f'password-{uuid.uuid4().__str__().split("-")[-1]}'
             self.password = temp_password
 
-            
+    def hashing_password(self):
+        if not self.password.startswith('pbkkdf2_sha256'):
+            self.set_password(self.password)
+
+    def token(self):
+        refresh = RefreshToken.for_user(self)
+        return {
+            'access': str(refresh.access_token)
+        }
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
