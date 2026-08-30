@@ -1,7 +1,9 @@
+from random import random
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from shared.models import BaseModel
 from datetime import datetime, timedelta
+from django.core.validators import FileExtensionValidator
 
 ORDINARY_USER, MANAGER, ADMIN = ('ordinary_user', 'manager', 'admin')
 VIA_EMAIL, VIA_PHONE = ("via_email", "via_phone")
@@ -28,10 +30,19 @@ class User(AbstractUser, BaseModel):
     AUTH_STATUS = models.CharField(max_length=31, choices=AUTH_STATUS, default=NEW)
     email = models.EmailField(max_length=255, unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=13, unique=True, null=True, blank=True)
-    photo = models.ImageField(upload_to="users/photos", null=True, blank=True)
+    photo = models.ImageField(upload_to="users/photos", null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'heic', 'heif'])])
 
     def __str__(self):
         return self.username
+
+    @property
+    def full_name(self):
+        return f"{self.first_name} {self.last_name}"
+
+    def create_verified_code(self, verified_type):
+        code = "".join([str(random.randint((0, 100) % 10) for _ in range(4)])
+        UserConfirmation.objects.create(user_id=self.id, verified_type=verified_type, code=code)
+        return code
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
