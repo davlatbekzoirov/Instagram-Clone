@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from shared.models import BaseModel
+from datetime import datetime, timedelta
 
 ORDINARY_USER, MANAGER, ADMIN = ('ordinary_user', 'manager', 'admin')
 VIA_EMAIL, VIA_PHONE = ("via_email", "via_phone")
@@ -31,3 +32,28 @@ class User(AbstractUser, BaseModel):
 
     def __str__(self):
         return self.username
+
+PHONE_EXPIRE = 2
+EMAIL_EXPIRE = 5
+
+class UserConfirmation(BaseModel):
+    TYPE_CHOICES = (
+        (VIA_PHONE, VIA_PHONE),
+        (VIA_EMAIL, VIA_EMAIL),
+    )
+    code = models.CharField(max_length=4)
+    verified_type = models.CharField(max_length=31, choices=TYPE_CHOICES)
+    user = models.ForeignKey('users.User', on_delete=models.CASCADE, related_name='verified_codes')
+    expiration_type = models.DateTimeField(null=True)
+    is_confirmed = models.BooleanField(default=False)
+
+    def __str__(self):
+        return str(self.user.__str__())
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            if self.verified_type == VIA_EMAIL:
+                self.expiration_type = datetime.now() + timedelta(minutes=EMAIL_EXPIRE)
+            else:
+                self.expiration_type = datetime.now() + timedelta(minutes=PHONE_EXPIRE)
+        super(UserConfirmation, self).save(*args, **kwargs)
