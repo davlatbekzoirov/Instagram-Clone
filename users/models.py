@@ -1,6 +1,5 @@
 import uuid
 from random import random
-from urllib.robotparser import normalize
 
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -59,6 +58,12 @@ class User(AbstractUser, BaseModel):
             normalize_email = self.email.lower()
             self.email = normalize_email
 
+    def check_password(self):
+        if not self.password:
+            temp_password = f'password-{uuid.uuid4().__str__().split("-")[-1]}'
+            self.password = temp_password
+
+            
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
