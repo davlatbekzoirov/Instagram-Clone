@@ -1,3 +1,4 @@
+import uuid
 from random import random
 from django.contrib.auth.models import AbstractUser
 from django.db import models
@@ -43,6 +44,13 @@ class User(AbstractUser, BaseModel):
         code = "".join([str(random.randint((0, 100) % 10) for _ in range(4)])
         UserConfirmation.objects.create(user_id=self.id, verified_type=verified_type, code=code)
         return code
+
+    def check_username(self):
+        if not self.username:
+            temp_username = f'instagram-{uuid.uuid4().__str__().split("-")[-1]}'
+            while User.objects.filter(username=temp_username):
+                temp_username = f'{temp_username}{random.randint(0,9)}'
+            self.username = temp_username
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
