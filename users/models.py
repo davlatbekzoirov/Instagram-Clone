@@ -70,8 +70,20 @@ class User(AbstractUser, BaseModel):
     def token(self):
         refresh = RefreshToken.for_user(self)
         return {
-            'access': str(refresh.access_token)
+            'access': str(refresh.access_token),
+            'refresh_token': str(refresh)
         }
+
+    def clean(self):
+        self.check_email()
+        self.check_username()
+        self.check_password()
+        self.hashing_password()
+
+    def save(self, *args, **kwargs):
+        if not self.pk:
+            self.clean()
+        super(User, self).save(*args, **kwargs)
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
