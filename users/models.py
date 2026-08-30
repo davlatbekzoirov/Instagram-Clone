@@ -1,5 +1,7 @@
 import uuid
 from random import random
+from urllib.robotparser import normalize
+
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from shared.models import BaseModel
@@ -51,6 +53,12 @@ class User(AbstractUser, BaseModel):
             while User.objects.filter(username=temp_username):
                 temp_username = f'{temp_username}{random.randint(0,9)}'
             self.username = temp_username
+
+    def check_email(self):
+        if self.email:
+            normalize_email = self.email.lower()
+            self.email = normalize_email
+
 
 PHONE_EXPIRE = 2
 EMAIL_EXPIRE = 5
