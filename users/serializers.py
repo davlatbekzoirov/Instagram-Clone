@@ -18,7 +18,15 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             'auth_status': {'read_only': True, 'required': False},
         }
 
+    def validate(self, data):
+        super(UserSignUpSerializer, self).validate(data)
+        data = self.auth_validate(data)
+        return data
+
     @staticmethod
-    def auth_validate(attrs):
-        # user_input = attrs.get('email_phone_number')
-        print(attrs)
+    def auth_validate(data):
+        print(data)
+        user_input = str(data.get('email_phone_number')).lower()
+        
+
+        return data
