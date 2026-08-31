@@ -1,3 +1,4 @@
+from shared.utils import check_email_or_phone
 from .models import User, UserConfirmation, VIA_EMAIL, VIA_PHONE, CODE_VERIFIED, NEW, CODE_VERIFIED, DONE, PHOTO_STEP
 from rest_framework import serializers, exceptions
 from django.db.models import Q
@@ -27,6 +28,8 @@ class UserSignUpSerializer(serializers.ModelSerializer):
     def auth_validate(data):
         print(data)
         user_input = str(data.get('email_phone_number')).lower()
-        
+        input_type = check_email_or_phone(user_input)
+        print('user_input', user_input)
+        print('input_type', input_type)
 
         return data
