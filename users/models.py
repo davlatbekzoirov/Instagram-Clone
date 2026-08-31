@@ -28,8 +28,8 @@ class User(AbstractUser, BaseModel):
         (PHOTO_STEP, PHOTO_STEP)
     )
     user_roles = models.CharField(max_length=31, choices=USER_ROLES, default=ORDINARY_USER)
-    AUTH_TYPE = models.CharField(max_length=31, choices=AUTH_TYPE_CHOICES)
-    AUTH_STATUS = models.CharField(max_length=31, choices=AUTH_STATUS, default=NEW)
+    auth_type = models.CharField(max_length=31, choices=AUTH_TYPE_CHOICES)
+    auth_status = models.CharField(max_length=31, choices=AUTH_STATUS, default=NEW)
     email = models.EmailField(max_length=255, unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=13, unique=True, null=True, blank=True)
     photo = models.ImageField(upload_to="users/photos", null=True, blank=True, validators=[FileExtensionValidator(allowed_extensions=['jpg', 'jpeg', 'png', 'heic', 'heif'])])
@@ -42,7 +42,7 @@ class User(AbstractUser, BaseModel):
         return f"{self.first_name} {self.last_name}"
 
     def create_verified_code(self, verified_type):
-        code = "".join([str(random.randint((0, 100) % 10) for _ in range(4)])
+        code = "".join([str(random.randint((0, 100) % 10) for _ in range(4))])
         UserConfirmation.objects.create(user_id=self.id, verified_type=verified_type, code=code)
         return code
 
