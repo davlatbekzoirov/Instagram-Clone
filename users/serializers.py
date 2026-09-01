@@ -29,7 +29,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             print('code', code)
             send_email(user.email, code)
         elif user.auth_type == VIA_PHONE:
-            code = user.create_phone_code(VIA_PHONE)
+            code = user.create_verified_code(VIA_PHONE)
             print('code', code)
             # send_phone_code(user.phone_number, code)
         user.save()
