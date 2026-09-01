@@ -19,6 +19,21 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             'auth_status': {'read_only': True, 'required': False}
         }
 
+    def create(self, validated_data):
+        user = super(UserSignUpSerializer, self).create(validated_data)
+        # user.set_password(validated_data['password'])
+        print('user', user)
+        print('validated_data', validated_data)
+        if user.auth_type == VIA_EMAIL:
+            code = user.create_verified_code(VIA_EMAIL)
+            print('code', code)
+            # send_mail(user.email, code)
+        elif user.auth_type == VIA_PHONE:
+            code = user.create_phone_code(VIA_PHONE)
+            print('code', code)
+            # send_phone_code(user.phone_number, code)
+        user.save()
+
     def validate(self, data):
         super(UserSignUpSerializer, self).validate(data)
         data = self.auth_validate(data)
@@ -47,3 +62,9 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             raise ValidationError(data)
 
         return data
+
+    def validate_email_phone_number(self, value):
+        value = str(value).lower()
+
+
+        return value
