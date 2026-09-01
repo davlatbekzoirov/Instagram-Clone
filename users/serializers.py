@@ -1,4 +1,4 @@
-from shared.utils import check_email_or_phone
+from shared.utils import check_email_or_phone, send_email
 from .models import User, UserConfirmation, VIA_EMAIL, VIA_PHONE, CODE_VERIFIED, NEW, CODE_VERIFIED, DONE, PHOTO_STEP
 from rest_framework import serializers, exceptions
 from django.db.models import Q
@@ -27,7 +27,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         if user.auth_type == VIA_EMAIL:
             code = user.create_verified_code(VIA_EMAIL)
             print('code', code)
-            # send_mail(user.email, code)
+            send_email(user.email, code)
         elif user.auth_type == VIA_PHONE:
             code = user.create_phone_code(VIA_PHONE)
             print('code', code)
