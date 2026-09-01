@@ -44,3 +44,9 @@ def send_email(email, code):
         'email/authetication/activate_account.html',
         {'code': code}
     )
+    Email.send_email({
+        'subject': 'Activate your account',
+        'to_email': email,
+        'body': html_content,
+        'content_type': 'html',
+    })
