@@ -41,5 +41,6 @@ class Email:
 
 def send_email(email, code):
     html_content = render_to_string(
-
+        'email/authetication/activate_account.html',
+        {'code': code}
     )
