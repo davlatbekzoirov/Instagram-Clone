@@ -6,16 +6,11 @@ phone_regex = re.compile(r"(\+[0-9]+\s*)?(\([0-9]+\))?[\s0-9\-]+[0-9]+")
 
 def check_email_or_phone(email_or_phone):
     if re.fullmatch(email_regex, email_or_phone):
-        email_or_phone = "email"
-
+        return "email"
     elif re.fullmatch(phone_regex, email_or_phone):
-        email_or_phone = "phone"
-
+        return "phone"
     else:
-        data = {
+        raise ValidationError({
             "success": False,
             "message": "Email yoki telefon raqamingiz noto'g'ri"
-        }
-        raise ValidationError(data)
-
-    return email_or_phone
+        })

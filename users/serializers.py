@@ -7,8 +7,8 @@ from rest_framework.exceptions import ValidationError
 class UserSignUpSerializer(serializers.ModelSerializer):
     id = serializers.UUIDField(read_only=True)
 
-    def init(self, *args, **kwargs):
-        super(UserSignUpSerializer, self).init(*args, **kwargs)
+    def __init__(self, *args, **kwargs):
+        super(UserSignUpSerializer, self).__init__(*args, **kwargs)
         self.fields['email_phone_number'] = serializers.CharField(required=False)
 
     class Meta:
@@ -16,7 +16,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         fields = ('id', 'auth_type', 'auth_status')
         extra_kwargs = {
             'auth_type': {'read_only': True, 'required': False},
-            'auth_status': {'read_only': True, 'required': False},
+            'auth_status': {'read_only': True, 'required': False}
         }
 
     def validate(self, data):
@@ -28,8 +28,22 @@ class UserSignUpSerializer(serializers.ModelSerializer):
     def auth_validate(data):
         print(data)
         user_input = str(data.get('email_phone_number')).lower()
-        input_type = check_email_or_phone(user_input)
-        print('user_input', user_input)
-        print('input_type', input_type)
+        input_type = check_email_or_phone(user_input)  # email or phone
+        if input_type == "email":
+            data = {
+                "email": user_input,
+                "auth_type": VIA_EMAIL
+            }
+        elif input_type == "phone":
+            data = {
+                "phone_number": user_input,
+                "auth_type": VIA_PHONE
+            }
+        else:
+            data = {
+                'success': False,
+                'message': "You must send email or phone number"
+            }
+            raise ValidationError(data)
 
         return data
