@@ -1,5 +1,5 @@
 import uuid
-from random import random
+import random
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -42,7 +42,7 @@ class User(AbstractUser, BaseModel):
         return f"{self.first_name} {self.last_name}"
 
     def create_verified_code(self, verified_type):
-        code = "".join([str(random.randint((0, 100) % 10) for _ in range(4))])
+        code = "".join(str(random.randint(0, 9)) for _ in range(4))
         UserConfirmation.objects.create(user_id=self.id, verified_type=verified_type, code=code)
         return code
 
@@ -77,12 +77,11 @@ class User(AbstractUser, BaseModel):
     def clean(self):
         self.check_email()
         self.check_username()
-        self.check_password()
+        self.check_pass()
         self.hashing_password()
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            self.clean()
+        self.clean()
         super(User, self).save(*args, **kwargs)
 
 PHONE_EXPIRE = 2

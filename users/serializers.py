@@ -33,6 +33,7 @@ class UserSignUpSerializer(serializers.ModelSerializer):
             print('code', code)
             # send_phone_code(user.phone_number, code)
         user.save()
+        return user
 
     def validate(self, data):
         super(UserSignUpSerializer, self).validate(data)
