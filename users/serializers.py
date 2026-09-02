@@ -65,8 +65,19 @@ class UserSignUpSerializer(serializers.ModelSerializer):
         return data
 
     def validate_email_phone_number(self, value):
-        value = str(value).lower()
-
+        value = value.lower()
+        if value and User.objects.filter(email=value).exists():
+            data = {
+                'success': False,
+                'message': "This email address is already in use."
+            }
+            raise ValidationError(data)
+        elif value and User.objects.filter(phone_number=value).exists():
+            data = {
+                'success': False,
+                'message': "This phone number is already in use."
+            }
+            raise ValidationError(data)
 
         return value
 
